@@ -1,0 +1,37 @@
+// Step 1:
+//  You should see a popup asking you if you want to install the
+//  Malloy extension.
+//
+//  Click: 'Install' and then return to this Editor Tab by clicking the files icon in the left sidebar (you might need to press refresh after the install)
+//
+source: airports is table('duckdb:airports.csv') {
+  measure: airport_count is count()
+
+  // Step 2:
+  // Click the 'Run' button below that will appear below after installing the extension
+
+  query: airports_by_region_dashboard is {
+    group_by: faa_region
+    aggregate: airport_count
+    nest:
+      by_state_shape_map is {
+        group_by: state
+        aggregate: airport_count
+      }
+      by_facility_type is {
+        group_by: fac_type
+        aggregate: airport_count
+      }
+  }
+
+  query: by_state is {
+    group_by: state
+    aggregate: airport_count
+  }
+
+  query: by_facility_type is {
+    group_by: fac_type
+    aggregate:
+      airport_count
+  }
+}

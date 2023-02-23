@@ -1,5 +1,9 @@
 # Try Malloy!
 
+Click [here](https://github.dev/malloydata/try-malloy/blob/main/airports.malloy#L13) to try Malloy instantly in your browser
+
+---
+
 This repository contains a quick start for trying Malloy in VS Code. It can be used directly on [Github's online editor](https://github.dev/malloydata/try-malloy/blob/main/airports.malloy#L13), on [vscode.dev](https://vscode.dev/github/malloydata/try-malloy), or inside a local VS Code instance.
 
 All that is required is an instance of VS Code and the Malloy extenion - the extension can be installed by clicking on the Extensions section in the left sidebar and searching for "Malloy".

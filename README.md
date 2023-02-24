@@ -11,4 +11,6 @@ This repository contains two important files:
 * A CSV file with information about US airports
 * An `airports.malloy` file that contains a simple Malloy model that operates on the CSV file.
 
-When `airports.malloy` is opened, the Malloy extension reads the model, which tells it to load `airports.csv` into a local instance of DuckDB, which is embedded in the Malloy extenion. Once the data is loaded into DuckDB, the schema is read, and the model is ready to be used. Click the "run" button above any query to execture the query.
+When `airports.malloy` is opened, the Malloy extension reads the file - a Malloy model - which tells the extension to load `airports.csv` into a local instance of DuckDB that is included by the extension. Once the data is loaded into DuckDB and the schema is read, the model is ready to be used.
+
+There are instructions in the file for how to try a few things - [go check it out](https://github.dev/malloydata/try-malloy/airports.malloy)!

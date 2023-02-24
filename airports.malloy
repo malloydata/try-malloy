@@ -1,9 +1,9 @@
 // Step 1:
-//   You should see a popup in the bottom right to install the
+//   After a moment, you should see a popup in the bottom right to install the
 //   Malloy extension - click Install. If you do not see it, click the "Extensions" button in the
 //   left sidebar to search for and install "Malloy"
 //
-//  Return to this file by clicking the files icon in the top of the left sidebar
+//  After installing, return to this file
 //
 source: airports is table('duckdb:airports.csv') {
   measure: airport_count is count()

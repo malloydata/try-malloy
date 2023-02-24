@@ -1,15 +1,15 @@
 // Step 1:
-//  You should see a popup asking you if you want to install the
-//  Malloy extension. If you do not, click the "Extensions" button in the left sidebar to search for and install "Malloy"
+//   You should see a popup in the bottom right to install the
+//   Malloy extension - click Install. If you do not see it, click the "Extensions" button in the
+//   left sidebar to search for and install "Malloy"
 //
-//  Click: 'Install' and then return to this Editor Tab by clicking the files icon in the left sidebar
-//  (you might need to press refresh after the install)
+//  Return to this file by clicking the files icon in the top of the left sidebar
 //
 source: airports is table('duckdb:airports.csv') {
   measure: airport_count is count()
 
   // Step 2:
-  //  Click the 'Run' button below that will appear below after installing the extension
+  //  Click the 'Run' button below that will appear above the first "query: " once the extension is installed
 
   query: airports_by_region_dashboard is {
     group_by: faa_region
@@ -25,6 +25,9 @@ source: airports is table('duckdb:airports.csv') {
       }
   }
 
+  // Step 3:
+  //   The above query is a bit more complex and also suggests how to render the data. Below are 2 of these queries
+  //   in a simpler form. Try clicking "Run"
   query: by_state is {
     group_by: state
     aggregate: airport_count
@@ -32,7 +35,13 @@ source: airports is table('duckdb:airports.csv') {
 
   query: by_facility_type is {
     group_by: fac_type
-    aggregate:
-      airport_count
+    aggregate: airport_count
   }
+
+  // Step 4:
+  //   To the right is a section called "MALLOY SCHEMA". This shows the schema of the loaded CSV file, and also any
+  //   elements created by this file, such as the query "by_state".
+  //   Try to create a new query called "by_elevation_tier" that counts airports bucketed by eleveation using the
+  //   Pick statement (https://malloydata.github.io/documentation/language/expressions.html#pick-expressions).
+  //   Perhaps bucket elevation into low (0-1000 ft), medium (1000-5000 ft), and high (>5000ft)
 }

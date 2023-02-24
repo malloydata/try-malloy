@@ -15,7 +15,6 @@ There are instructions in the file for how to try a few things - [go check it ou
 
 ## Additional Resources:
 
-* [Homepage](http://malloydata.dev)
 * [Docs and Guides](https://malloydata.github.io/documentation/)
 * [Malloy Github repository](https://github.com/malloydata/malloy/)
 * Join our [Slack community](https://join.slack.com/t/malloy-community/shared_invite/zt-1kgfwgi5g-CrsdaRqs81QY67QW0~t_uw)

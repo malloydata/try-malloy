@@ -36,7 +36,7 @@ source: airports is table('duckdb:airports.csv') {
   }
 
   // Step 4:
-  //   To the right is a section called "MALLOY SCHEMA". This shows the schema of the loaded CSV file, and also any
+  //   To the left is a section called "MALLOY SCHEMA". This shows the schema of the loaded CSV file, and also any
   //   elements created by this file, such as the query "by_state".
   //   Try to create a new query called "by_elevation_tier" that counts airports bucketed by eleveation using the
   //   Pick statement (https://malloydata.github.io/documentation/language/expressions.html#pick-expressions).

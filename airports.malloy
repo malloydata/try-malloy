@@ -22,8 +22,7 @@ source: airports is table('duckdb:airports.csv') {
   }
 
   // Step 3:
-  //   The above query is a bit more complex and also suggests how to render the data. Below are 2 of these queries
-  //   in a simpler form. Try clicking "Run"
+  //   Here are some simpler queries to try - click run!
   query: by_state is {
     group_by: state
     aggregate: airport_count
@@ -37,6 +36,7 @@ source: airports is table('duckdb:airports.csv') {
   // Step 4:
   //   To the left is a section called "MALLOY SCHEMA". This shows the schema of the loaded CSV file, and also any
   //   elements created by this file, such as the query "by_state".
+  //
   //   Try to create a new query called "by_elevation_tier" that counts airports bucketed by eleveation using the
   //   Pick statement (https://malloydata.github.io/documentation/language/expressions.html#pick-expressions).
   //   Perhaps bucket elevation into low (0-1000 ft), medium (1000-5000 ft), and high (>5000ft)

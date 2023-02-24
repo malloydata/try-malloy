@@ -1,12 +1,10 @@
-# Try Malloy!
+# Try Malloy
 
 ### [Click here](https://github.dev/malloydata/try-malloy/airports.malloy) to try Malloy instantly in your browser
 
-This repository contains a quick start for trying Malloy in VS Code. It can be used directly on [Github's online editor](https://github.dev/malloydata/try-malloy/blob/main/airports.malloy#L13), on [vscode.dev](https://vscode.dev/github/malloydata/try-malloy), or inside a local VS Code instance.
+This repository is a quick-start for playing with Malloy in VS Code. It can be used directly on [Github's online editor](https://github.dev/malloydata/try-malloy/airports.malloy), on [vscode.dev](https://vscode.dev/github/malloydata/try-malloy), or inside a local VS Code instance. All that is required is an instance of VS Code and the Malloy extenion - the extension can be installed by clicking on the Extensions section in the left sidebar and searching for "Malloy".
 
-All that is required is an instance of VS Code and the Malloy extenion - the extension can be installed by clicking on the Extensions section in the left sidebar and searching for "Malloy".
-
-This repository contains two important files:
+The repository contains two important files:
 
 * A CSV file with information about US airports
 * An `airports.malloy` file that contains a simple Malloy model that operates on the CSV file.

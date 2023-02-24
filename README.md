@@ -6,7 +6,7 @@ This repository is a quick-start for playing with Malloy in VS Code. It can be u
 
 The repository contains two important files:
 
-* A CSV file with information about US airports
+* A CSV file, `airports.csv`, with information about US airports
 * An `airports.malloy` file that contains a simple Malloy model that operates on the CSV file.
 
 When `airports.malloy` is opened, the Malloy extension reads the file - a Malloy model - which tells the extension to load `airports.csv` into a local instance of DuckDB that is included by the extension. Once the data is loaded into DuckDB and the schema is read, the model is ready to be used.

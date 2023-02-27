@@ -1,0 +1,11 @@
+{
+  "readme": "./airports.malloy",
+  "title": "Airports",
+  "models": [
+    {
+      "id": "airports",
+      "path": "airports.malloy",
+      "tables": ["airports.csv"]
+    }
+  ]
+}

@@ -1,6 +1,5 @@
 {
-  "title": "Try Malloy",
-  "readme": "try-malloy.md",
+  "title": "Airports",
   "models": [
     {
       "id": "airports",

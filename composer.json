@@ -1,4 +1,5 @@
 {
+  "readme": "./airports.malloy",
   "title": "Airports",
   "models": [
     {

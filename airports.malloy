@@ -1,3 +1,8 @@
+// Follow along with the quick-start here to learn more:
+// https://malloydata.github.io/documentation/user_guides/basic.html
+// (note: use "table('duckdb:airports.csv')" instead of "table('malloy-data.faa.airports')" if you're
+// trying the quick start guide)
+
 // Step 1:
 //   After a moment, you should see a popup in the bottom right to install the
 //   Malloy extension - click Install. If you do not see it, click the "Extensions" button in the

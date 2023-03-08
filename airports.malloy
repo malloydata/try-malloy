@@ -1,17 +1,19 @@
-// Follow along with the quick-start here to learn more:
+// Follow along with the quickstart here to learn more:
 // https://malloydata.github.io/documentation/user_guides/basic.html
-// (note: use "table('duckdb:airports.csv')" instead of "table('malloy-data.faa.airports')" if you're
-// trying the quick start guide)
+// (note: use "table('duckdb:airports.csv')" instead of
+// "table('malloy-data.faa.airports')" if you're trying the quick start guide)
 
 // Step 1:
 //   After a moment, you should see a popup in the bottom right to install the
-//   Malloy extension - click Install. If you do not see it, click the "Extensions" button in the
-//   left sidebar to search for and install "Malloy". After installing, return to this file
+//   Malloy extension - click Install. If you do not see it, click the
+//   "Extensions" button in the left sidebar to search for and install "Malloy".
+//   After installing, return to this file
 source: airports is table('duckdb:airports.csv') {
   measure: airport_count is count()
 
   // Step 2:
-  //  Click the 'Run' button below that will appear above the first "query: " once the extension is installed
+  //  Click the 'Run' button below that will appear above the first "query: "
+  //  once the extension is installed
   query: airports_by_region_dashboard is {
     group_by: faa_region
     aggregate: airport_count
@@ -39,10 +41,13 @@ source: airports is table('duckdb:airports.csv') {
   }
 
   // Step 4:
-  //   To the left is a section called "MALLOY SCHEMA". This shows the schema of the loaded CSV file, and also any
-  //   elements created by this file, such as the query "by_state".
+  //   To the left is a section called "MALLOY SCHEMA". This shows the schema
+  //   of the loaded CSV file, and also any elements created by this file, such
+  //   as the query "by_state".
   //
-  //   Try to create a new query called "by_elevation_tier" that counts airports bucketed by eleveation using the
-  //   Pick statement (https://malloydata.github.io/documentation/language/expressions.html#pick-expressions).
-  //   Perhaps bucket elevation into low (0-1000 ft), medium (1000-5000 ft), and high (>5000ft)
+  //   Try to create a new query called "by_elevation_tier" that counts
+  //   airports bucketed by eleveation using the Pick statement
+  //   (https://malloydata.github.io/documentation/language/expressions.html#pick-expressions).
+  //   Perhaps bucket elevation into low (0-1000 ft), medium (1000-5000 ft),
+  //   and high (>5000ft)
 }

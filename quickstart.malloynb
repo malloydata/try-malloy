@@ -1,0 +1,374 @@
+[
+  {
+    "kind": 1,
+    "language": "markdown",
+    "value": "# Malloy Quickstart\nThis guide introduces the basics of querying and modeling with Malloy, using a Malloy Notebook. It is meant to be viewed in VSCode either on your desktop, or browser.",
+    "metadata": {}
+  },
+  {
+    "kind": 1,
+    "language": "markdown",
+    "value": "## Leading with the Source\n\nQueries are of the form: _source_ `->` _operation_\n\nIn Malloy, the source of a query is either a raw table, a modeled source, or another query.\n\nIn this example, the `table()` function provides the query _source_ from a table (or view) in the database. In this case, the table is a CSV file that we are reading using DuckDB. the query _operation_ is explicit about which fields are grouped, aggregated, or projected.",
+    "metadata": {}
+  },
+  {
+    "kind": 2,
+    "language": "malloy",
+    "value": "query: table('duckdb:data/airports.csv') -> {\n    group_by: state\n    aggregate: airport_count is count()\n    top: 5\n}",
+    "metadata": {}
+  },
+  {
+    "kind": 1,
+    "language": "markdown",
+    "value": "## Query Operators\n\nIn SQL, the `SELECT` command does two very different things. A `SELECT` with a `GROUP BY` aggregates data according to the `GROUP BY` clause and produces aggregate calculation against every calculation not in the `GROUP BY`. In Malloy, the query operator for this is `group_by:`. Calculation about data in the group are made using aggregate:.\n\nThe second type of `SELECT` in SQL does not perform any aggregation; All rows in the input table, unless filtered in some way, show up in the output table. In Malloy, this command is called project:.\n\nIn the query below, the data will be grouped by state and will produce an aggregate calculation for airport_count and average_elevation. `group_by:`. The `aggregate:` list can contain references to existing aggregate fields or add new aggregate computations.",
+    "metadata": {}
+  },
+  {
+    "kind": 2,
+    "language": "malloy",
+    "value": "query: table('duckdb:data/airports.csv') -> {\n  group_by:\n    state\n    county\n  aggregate:\n    airport_count is count()\n    average_elevation is avg(elevation)\n  top: 5\n}",
+    "metadata": {}
+  },
+  {
+    "kind": 1,
+    "language": "markdown",
+    "value": "### Multiple Field Operations\n\nMultiple `group_by:` and `aggregate:` statements can appear in the same query operation. This can be helpful in rendering when the order of fields in the query output is significant.",
+    "metadata": {}
+  },
+  {
+    "kind": 2,
+    "language": "malloy",
+    "value": "query: table('duckdb:data/airports.csv') -> {\n  group_by: fac_type\n  aggregate: airport_count is count()\n  group_by: county\n  aggregate: max_elevation is max(elevation)\n  top: 5\n}",
+    "metadata": {}
+  },
+  {
+    "kind": 1,
+    "language": "markdown",
+    "value": "### Project\n\n`project` produces a list of fields. For every row in the input table, there is a row in the output table.\n",
+    "metadata": {}
+  },
+  {
+    "kind": 2,
+    "language": "malloy",
+    "value": "query: table('duckdb:data/airports.csv') -> {\n  project: code, full_name, city, county\n  where: county = 'SANTA CRUZ'\n  top: 5\n}",
+    "metadata": {}
+  },
+  {
+    "kind": 1,
+    "language": "markdown",
+    "value": "## Everything has a Name\nIn Malloy, all output fields have names. This means that any time a query introduces a new aggregate computation, it must be named. (unlike SQL, which allows un-named expressions)\n",
+    "metadata": {}
+  },
+  {
+    "kind": 2,
+    "language": "malloy",
+    "value": "query: table('duckdb:data/airports.csv') -> {\n  aggregate: max_elevation is max(elevation)\n}",
+    "metadata": {}
+  },
+  {
+    "kind": 1,
+    "language": "markdown",
+    "value": "Notice that Malloy uses the form \"name is value\" instead of SQL's \"value as name\". Having the output column name written first makes it easier for someone reading the code to visualize the resulting query structure.\n\nNamed objects, like columns from a table, and fields defined in a source, can be included in field lists without an `is`",
+    "metadata": {}
+  },
+  {
+    "kind": 2,
+    "language": "malloy",
+    "value": "query: table('duckdb:data/airports.csv') -> {\n  project:\n    full_name\n    elevation\nlimit: 5\n}",
+    "metadata": {}
+  },
+  {
+    "kind": 1,
+    "language": "markdown",
+    "value": "## Expressions\n\nMany SQL expressions will work unchanged in Malloy, and many functions available in Standard SQL are usable in Malloy as well. This makes expressions fairly straightforward to understand, given a knowledge of SQL.\n",
+    "metadata": {}
+  },
+  {
+    "kind": 2,
+    "language": "malloy",
+    "value": "query: table('duckdb:data/airports.csv') -> {\n  group_by: county_and_state is concat(county, ', ', state)\n  aggregate:\n    airport_count is count()\n    max_elevation is max(elevation)\n    min_elevation is min(elevation)\n    avg_elevation is avg(elevation)\n  top: 5\n}\n",
+    "metadata": {}
+  },
+  {
+    "kind": 1,
+    "language": "markdown",
+    "value": "The basic types of Malloy expressions are `string`, `number`, `boolean`, `date`, and `timestamp`.",
+    "metadata": {}
+  },
+  {
+    "kind": 1,
+    "language": "markdown",
+    "value": "## Modeling and Reuse\n\nOne of the main benefits of Malloy is the ability to save common calculations into a data model. In the example below, we create a source object named `airports` and add a `dimension:` calculation for `county_and_state` and `measure:` calculation for `airport_count`. Dimensions can be used in `group_by:`, `project:` and `where:`. Measures can be used in `aggregate:` and `having:`.",
+    "metadata": {}
+  },
+  {
+    "kind": 2,
+    "language": "malloy",
+    "value": "source: airports_src is table('duckdb:data/airports.csv') {\n  dimension: county_and_state is concat(county, ', ', state)\n  measure: airport_count is count()\n  measure: average_elevation is avg(elevation)\n}\n\nquery: airports_src -> {\n  group_by: county_and_state\n  aggregate: airport_count\n  top: 5\n}",
+    "metadata": {}
+  },
+  {
+    "kind": 1,
+    "language": "markdown",
+    "value": "## Ordering and Limiting\n\nIn Malloy, ordering and limiting work pretty much the same way they do in SQL, though Malloy introduces some reasonable defaults.\n\nThe `top:` and `limit:` statements are synonyms and limits the number of rows returned. Results below are sorted by the first measure descending--in this case, `airport_count`.",
+    "metadata": {}
+  },
+  {
+    "kind": 2,
+    "language": "malloy",
+    "value": "query: table('duckdb:data/airports.csv') -> {\n  top: 2\n  group_by: state\n  aggregate: airport_count is count()\n}",
+    "metadata": {}
+  },
+  {
+    "kind": 1,
+    "language": "markdown",
+    "value": "Default ordering can be overridden with `order_by:`, as in the following query, which shows the states in alphabetical order. `order_by:` can take a field index number or the name of a field.",
+    "metadata": {}
+  },
+  {
+    "kind": 2,
+    "language": "malloy",
+    "value": "query: table('duckdb:data/airports.csv') -> {\n  order_by: state\n  group_by: state\n  aggregate: airport_count is count()\n  limit: 5\n}",
+    "metadata": {}
+  },
+  {
+    "kind": 1,
+    "language": "markdown",
+    "value": "## Filtering\nWhen working with data, filtering is something you do in almost every query. Malloy's filtering is more powerful and expressive than that of SQL. When querying data, we first isolate the data we are interested in (filter it) and then perform aggregations and calculations on the data we've isolated (shape it). Malloy provides consistent syntax for filtering everywhere within a query.\n\n### Filtering the Source\nA filter on a data source table narrows down which data is included to be passed to the query operation. This translates to a `WHERE` clause in SQL. In this case, the data from the table is filtered to just airports in California.",
+    "metadata": {}
+  },
+  {
+    "kind": 2,
+    "language": "malloy",
+    "value": "query: table('duckdb:data/airports.csv') { where: state = 'CA' } -> {\n  top: 2\n  group_by: county\n  aggregate: airport_count is count()\n}\n",
+    "metadata": {}
+  },
+  {
+    "kind": 1,
+    "language": "markdown",
+    "value": "### Filtering Query Stages\nFilters can also be applied to any query operation. When using a filter in this way, it only applies to the data for that operation alone. (More on this later, in the section on `nest:` operations in queries.)",
+    "metadata": {}
+  },
+  {
+    "kind": 2,
+    "language": "malloy",
+    "value": "query: table('duckdb:data/airports.csv') -> {\n  where: state ? 'AL' | 'KY'\n  top: 5\n  group_by: state\n  aggregate:\n    airports  is count() { where: fac_type = 'AIRPORT' }\n    heliports is count() { where: fac_type = 'HELIPORT' }\n    total     is count()\n}",
+    "metadata": {}
+  },
+  {
+    "kind": 1,
+    "language": "markdown",
+    "value": "A note on filtering the source vs filtering in query stages: The below queries are both valid and produce identical SQL.",
+    "metadata": {}
+  },
+  {
+    "kind": 2,
+    "language": "malloy",
+    "value": "query: table('duckdb:data/airports.csv') { where: state = 'CA' } -> {\n  top: 2\n  group_by: county\n  aggregate: airport_count is count()\n}",
+    "metadata": {}
+  },
+  {
+    "kind": 2,
+    "language": "malloy",
+    "value": "query: table('duckdb:data/airports.csv') -> {\n  where: state = 'CA'\n  top: 2\n  group_by: county\n  aggregate: airport_count is count()\n}",
+    "metadata": {}
+  },
+  {
+    "kind": 1,
+    "language": "markdown",
+    "value": "### Filtering Measures\nA filter on an aggregate calculation (a measure) narrows down the data used in that specific calculation. In the example below, the calculations for airports and heliports are filtered separately.",
+    "metadata": {}
+  },
+  {
+    "kind": 2,
+    "language": "malloy",
+    "value": "query: table('duckdb:data/airports.csv') -> {\n  group_by: state\n  aggregate:\n    airports is count() { where: fac_type = 'AIRPORT' }\n    heliports is count() { where: fac_type = 'HELIPORT' }\n    total is count()\n  top: 5\n}",
+    "metadata": {}
+  },
+  {
+    "kind": 1,
+    "language": "markdown",
+    "value": "## Dates and Timestamps\nWorking with time in data is often needlessly complex; Malloy has built in constructs to simplify many time-related operations. This section gives a brief introduction to some of these tools, but for more details see the Time Ranges section.\n\n### Time Literals\nLiterals of type date and timestamp are notated with an @, e.g. @2003-03-29 or @1994-07-14 10:23:59. Similarly, years (@2021), quarters (@2020-Q1), months (@2019-03), weeks (@WK2021-08-01), and minutes (@2017-01-01 10:53) can be expressed.\n\nTime literals can be used as values, but are more often useful in filters. For example, the following query shows the number of flights in 2003.\n",
+    "metadata": {}
+  },
+  {
+    "kind": 2,
+    "language": "malloy",
+    "value": " query: table('duckdb:data/flights.parquet') { where: dep_time ? @2003 } -> {\n  aggregate: flight_count is count()\n}\n",
+    "metadata": {}
+  },
+  {
+    "kind": 1,
+    "language": "markdown",
+    "value": "There is a special time literal now, referring to the current timestamp, which allows for relative time filters.",
+    "metadata": {}
+  },
+  {
+    "kind": 2,
+    "language": "malloy",
+    "value": "query: table('duckdb:data/flights.parquet') { where: dep_time > now - 6 hours } -> {\n  aggregate: flights_last_6_hours is count()\n}",
+    "metadata": {}
+  },
+  {
+    "kind": 1,
+    "language": "markdown",
+    "value": "### Truncation\nTime values can be truncated to a given timeframe, which can be second, minute, hour, day, week, month, quarter, or year.",
+    "metadata": {}
+  },
+  {
+    "kind": 2,
+    "language": "malloy",
+    "value": "query: table('duckdb:data/flights.parquet') -> {\n  group_by:\n    flight_year is dep_time.year\n    flight_month is dep_time.month\n  aggregate: flight_count is count()\n  top: 5\n}",
+    "metadata": {}
+  },
+  {
+    "kind": 1,
+    "language": "markdown",
+    "value": "### Extraction\nNumeric values can be extracted from time values, e.g. `day_of_year(some_date)` or `minute(some_time)`. See the full list of extraction functions [here](https://malloydata.github.io/documentation/language/expressions.html#time-extraction).\n",
+    "metadata": {}
+  },
+  {
+    "kind": 2,
+    "language": "malloy",
+    "value": "query: table('duckdb:data/flights.parquet') -> {\n  order_by: 1\n  group_by: day_of_week is day_of_week(dep_time)\n  aggregate: flight_count is count()\n}\n",
+    "metadata": {}
+  },
+  {
+    "kind": 1,
+    "language": "markdown",
+    "value": "### Time Ranges\nTwo kinds of time ranges are given special syntax: the range between two times and the range starting at some time for some duration. These are represented like `@2003 to @2005` and `@2004-Q1 for 6 quarters` respectively. These ranges can be used in filters just like time literals.\n",
+    "metadata": {}
+  },
+  {
+    "kind": 2,
+    "language": "malloy",
+    "value": "query: table('duckdb:data/flights.parquet') { where: dep_time ? @2003 to @2005 } -> {\n  aggregate: flight_count is count()\n}",
+    "metadata": {}
+  },
+  {
+    "kind": 1,
+    "language": "markdown",
+    "value": "Time literals and truncations can also behave like time ranges. Each kind of time literal has an implied duration that takes effect when it is used in a comparison, e.g. `@2003` represents the whole of the year 2003, and `@2004-Q1` lasts the whole 3 months of the quarter. Similarly, when a time value is truncated, it takes on the timeframe from the truncation, e.g. `now.month` means the entirety of the current month.\n\nWhen a time range is used in a comparison, `=` checks for \"is in the range\", `>` \"is after\", and `<` \"is before.\" So `some_time > @2003` filters dates starting on January 1, 2004, while `some_time = @2003` filters to dates in the year 2003.",
+    "metadata": {}
+  },
+  {
+    "kind": 2,
+    "language": "malloy",
+    "value": "query: table('duckdb:data/flights.parquet') { where: dep_time > @2003 } -> {\n  top: 3; order_by: departure_date asc\n  group_by: departure_date is dep_time.day\n  aggregate: flight_count is count()\n}\n",
+    "metadata": {}
+  },
+  {
+    "kind": 1,
+    "language": "markdown",
+    "value": "## Nested Queries\n\nThe next several examples will use this simple source definition:",
+    "metadata": {}
+  },
+  {
+    "kind": 2,
+    "language": "malloy",
+    "value": "source: airports is table('duckdb:data/airports.csv') {\n  measure: airport_count is count()\n};",
+    "metadata": {}
+  },
+  {
+    "kind": 1,
+    "language": "markdown",
+    "value": "### Aggregating Subqueries\n\nIn Malloy, queries can be nested to produce subtables on each output row. Such nested queries are called aggregating subqueries, or simply \"nested queries.\" When a query is nested inside another query, each output row of the outer query will have a nested table for the inner query which only includes data limited to that row.",
+    "metadata": {}
+  },
+  {
+    "kind": 2,
+    "language": "malloy",
+    "value": "query: airports -> {\n  group_by: state\n  aggregate: airport_count\n  nest: by_facility is {\n    group_by: fac_type\n    aggregate: airport_count\n  }\n  top: 5\n}",
+    "metadata": {}
+  },
+  {
+    "kind": 1,
+    "language": "markdown",
+    "value": "Here we can see that the by_facility column of the output table contains nested subtables on each row. When interpreting these inner tables, all of the dimensional values from outer rows still apply to each of the inner rows.\n\nQueries can be nested infinitely, allowing for rich, complex output structures. A query may always include another nested query, regardless of depth.",
+    "metadata": {}
+  },
+  {
+    "kind": 2,
+    "language": "malloy",
+    "value": "query: airports -> {\n  group_by: state\n  aggregate: airport_count\n  top: 5\n  nest: top_5_counties is {\n    top: 5\n    group_by: county\n    aggregate: airport_count\n    nest: by_facility is {\n      group_by: fac_type\n      aggregate: airport_count\n    }\n  }\n}\n",
+    "metadata": {}
+  },
+  {
+    "kind": 1,
+    "language": "markdown",
+    "value": "### Filtering Nested Queries\nFilters can be isolated to any level of nesting. In the following example, we limit the `major_facilities` query to only airports where major is `Y`. This particular filter applies only to `major_facilities`, and not to other parts of the outer query.",
+    "metadata": {}
+  },
+  {
+    "kind": 2,
+    "language": "malloy",
+    "value": "query: airports -> {\n  where: state = 'CA'\n  group_by: county\n  aggregate: airport_count\n  top: 5\n  nest: major_facilities is {\n    where: major = 'Y'\n    group_by: name is concat(code, ' (', full_name, ')')\n  }\n  nest: by_facility is {\n    group_by: fac_type\n    aggregate: airport_count\n  }\n}",
+    "metadata": {}
+  },
+  {
+    "kind": 1,
+    "language": "markdown",
+    "value": "## Pipelines and Multi-stage Queries\nThe output from one stage of a query can be passed into another stage using `->`. For example, we'll start with this query which outputs, for California and New York, the total number of airports, as well as the number of airports in each county.",
+    "metadata": {}
+  },
+  {
+    "kind": 2,
+    "language": "malloy",
+    "value": "query: airports -> {\n  where: state = 'CA' | 'NY'\n  group_by: state\n  aggregate: airport_count\n  nest: by_county is {\n    group_by: county\n    aggregate: airport_count\n  }\n}",
+    "metadata": {}
+  },
+  {
+    "kind": 1,
+    "language": "markdown",
+    "value": "Next, we'll use the output of that query as the input to another, where we determine which counties have the highest percentage of airports compared to the whole state, taking advantage of the nested structure of the data to to so.",
+    "metadata": {}
+  },
+  {
+    "kind": 2,
+    "language": "malloy",
+    "value": "query: airports -> {\n  where: state = 'CA' | 'NY'\n  group_by: state\n  aggregate: airport_count\n  nest: by_county is {\n    group_by: county\n    aggregate: airport_count\n  }\n} -> {\n  top: 10; order_by: 4 desc\n  project:\n    by_county.county\n    airports_in_county is by_county.airport_count\n    airports_in_state is airport_count\n    percent_in_county is by_county.airport_count / airport_count\n}",
+    "metadata": {}
+  },
+  {
+    "kind": 1,
+    "language": "markdown",
+    "value": "## Joins\nJoins are declared as part of a source. When joining a source to another, it brings with it all child joins.",
+    "metadata": {}
+  },
+  {
+    "kind": 2,
+    "language": "malloy",
+    "value": "source: aircraft_models is table('duckdb:data/aircraft_models.parquet') {\n  primary_key: aircraft_model_code\n}\n\nsource: aircraft is table('duckdb:data/aircraft.parquet') {\n  primary_key: tail_num\n  join_one: aircraft_models on aircraft_model_code = aircraft_models.aircraft_model_code\n}\n\nsource: flights is table('duckdb:data/flights.parquet') {\n  join_one: aircraft on tail_num = aircraft.tail_num\n  measure: flight_count is count()\n}\n\nquery: flights->{\n  where: dep_time ? @2003-01\n  group_by: aircraft.aircraft_models.manufacturer\n  aggregate:\n    flight_count\n    aircraft_count is aircraft.count()\n    average_seats_per_model is aircraft.aircraft_models.seats.avg()\n  top: 5\n}",
+    "metadata": {}
+  },
+  {
+    "kind": 1,
+    "language": "markdown",
+    "value": "In this example, the `aircraft` source is joined to `flights`, and `aircraft_models` is joined via `aircraft`. These examples explicitly name both keys. This same syntax can be used to write more complex joins.\n",
+    "metadata": {}
+  },
+  {
+    "kind": 1,
+    "language": "markdown",
+    "value": "## Aggregate Calculations\n\nAs in SQL, aggregate functions `sum`, `count`, and `avg` are available, and their use in an expression identifies the corresponding field as a measure.\n\nAggregates may be computed with respect to any joined source, allowing for a wider variety of measurements to be calculated than is possible in SQL. See the [Aggregate Locality](https://malloydata.github.io/documentation/language/aggregates.html#aggregate-locality) section for more information.\n",
+    "metadata": {}
+  },
+  {
+    "kind": 2,
+    "language": "malloy",
+    "value": "query: aircraft -> {\n  aggregate:\n    // The average number of seats on models of registered aircraft\n    models_avg_seats is aircraft_models.seats.avg()\n    // The average number of seats on registered aircraft\n    aircraft_avg_seats is avg(aircraft_models.seats)\n}",
+    "metadata": {}
+  },
+  {
+    "kind": 1,
+    "language": "markdown",
+    "value": "## Comments\n\nMalloy code can include both line and block comments. Line comments, which begin with `--` or `//`, may appear anywhere within a line, and cause all subsequent characters on that line to be ignored. Block comments, which are enclosed between `/*` and `*/`, cause all enclosed characters to be ignored and may span multiple lines.",
+    "metadata": {}
+  },
+  {
+    "kind": 2,
+    "language": "malloy",
+    "value": "-- The total number of flight entries\nquery: flights -> {\n  aggregate: flight_count // Defined simply as `count()`\n}\n\n/*\n * A comparison of the total number of flights\n * for each of the tracked carriers.\n */\nquery: flights -> {\n  group_by: carrier\n  aggregate: flight_count /* , total_distance */\n}",
+    "metadata": {}
+  }
+]

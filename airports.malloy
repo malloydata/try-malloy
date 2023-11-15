@@ -8,13 +8,13 @@
 //   Malloy extension - click Install. If you do not see it, click the
 //   "Extensions" button in the left sidebar to search for and install "Malloy".
 //   After installing, return to this file
-source: airports is table('duckdb:airports.csv') {
+source: airports is duckdb.table('airports.csv') extend {
   measure: airport_count is count()
 
   // Step 2:
   //  Click the 'Run' button below that will appear above the first "query: "
   //  once the extension is installed
-  query: airports_by_region_dashboard is {
+  view: airports_by_region_dashboard is {
     group_by: faa_region
     aggregate: airport_count
     nest:
@@ -30,12 +30,12 @@ source: airports is table('duckdb:airports.csv') {
 
   // Step 3:
   //   Here are some simpler queries to try - click run!
-  query: by_state is {
+  view: by_state is {
     group_by: state
     aggregate: airport_count
   }
 
-  query: by_facility_type is {
+  view: by_facility_type is {
     group_by: fac_type
     aggregate: airport_count
   }
